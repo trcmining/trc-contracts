@@ -1,0 +1,20 @@
+{
+  "name": "trc-contracts",
+  "version": "0.1.0",
+  "description": "Source for TRC (Trade Credit) and its supporting contracts, matching the verified bytecode on Ethereum mainnet",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "verify:onchain": "hardhat compile && node scripts/verify-onchain.mjs"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "5.4.0",
+    "@openzeppelin/merkle-tree": "^1.0.8",
+    "dotenv": "^16.3.1",
+    "hardhat": "^2.19.4",
+    "typescript": "^5.3.3"
+  },
+  "private": false,
+  "license": "MIT"
+}

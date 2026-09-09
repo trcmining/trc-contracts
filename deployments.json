@@ -1,0 +1,152 @@
+{
+  "ethereum-mainnet": {
+    "_comment": "Registry of the contracts deployed by this project. Addresses, constructor arguments and deployment transactions are authoritative on chain; owners change with governance actions, so what is recorded here is the last known state. This file is the source the whitepaper and the README quote from — if it goes stale, anyone checking our claims against it will conclude the addresses were made up.",
+    "chainId": 1,
+    "explorer": "https://etherscan.io",
+    "addresses": {
+      "deployer": {
+        "address": "0xD8618C1CCDB57606bfCEc1E7dE09402B8e64A25A",
+        "role": "Deployment wallet / pays gas",
+        "note": "Early deployment wallet. On 2026-09-07 the project owner confirmed the private key is secure — this entry previously recorded it as \"transmitted over an external channel, treat as compromised\"; that assessment was wrong and has been corrected."
+      },
+      "tokenRecipient": {
+        "address": "0x1375b29a88474199E1AA5b46C639D0c3cDf5EAfB",
+        "role": "Initial recipient; holds the entire supply and is also the owner of TRC",
+        "note": "Initial recipient address, currently holding 899,000,000 TRC (the 100,000,000 team allocation has been moved into TokenVesting). On 2026-09-07 the project owner confirmed the private key is secure — this entry previously recorded it as \"transmitted over an external channel, treat as compromised\"; that assessment was wrong and has been corrected."
+      }
+    },
+    "contracts": {
+      "TRC": {
+        "name": "Trade Credit",
+        "symbol": "TRC",
+        "decimals": 8,
+        "totalSupply": "1000000000",
+        "source": "src/AdvancedERC20.sol:AdvancedERC20",
+        "address": "0x76371918bc75470CEE749685dC57bd6c3B8e82f2",
+        "deployTx": "0xc46ed8a7e9b66917a09b0d9bf68c9547b860af5ef006e2b6280dc70a5bc98095",
+        "deployBlock": 25788228,
+        "deployedAt": "2026-08-19T09:22:23Z",
+        "deployer": "0xD8618C1CCDB57606bfCEc1E7dE09402B8e64A25A",
+        "verified": true,
+        "constructorArgs": [
+          "Trade Credit",
+          "TRC",
+          8,
+          "1000000000",
+          "0x1375b29a88474199E1AA5b46C639D0c3cDf5EAfB",
+          0,
+          0,
+          0,
+          "0x1375b29a88474199E1AA5b46C639D0c3cDf5EAfB",
+          "100000",
+          "1000000000",
+          0
+        ],
+        "owner": "0x1375b29a88474199E1AA5b46C639D0c3cDf5EAfB",
+        "ownerHistory": [
+          {
+            "from": "0xD8618C1CCDB57606bfCEc1E7dE09402B8e64A25A",
+            "to": "0x1375b29a88474199E1AA5b46C639D0c3cDf5EAfB",
+            "tx": "0xce64ad8a00d76d322da3a0427f0b384e0cb0cb0f468b3b208c1c0a47b296a65c",
+            "at": "2026-08-19T09:24:23Z"
+          }
+        ],
+        "notes": [
+          "No mint function. The total supply is minted once in the constructor to the recipient address and is fixed permanently thereafter.",
+          "Includes burn / burnFrom — the Advanced template inherits ERC20Burnable unconditionally.",
+          "Includes setBlacklist — part of the Advanced template, not an option selected at creation time.",
+          "Taxes and trading limits apply only to pairs registered via setDexPair. No pair is registered at present, so none of them are currently in effect.",
+          "Initial taxes 0%, per-transaction cap 100,000 tokens, wallet cap = total supply (i.e. no cap), cooldown 0 seconds."
+        ]
+      },
+      "BatchDistributor": {
+        "source": "src/BatchDistributor.sol:BatchDistributor",
+        "address": "0x31567650f1d7672358B1265FCd95d36A7c7A0825",
+        "deployedAt": "2026-09-05",
+        "verified": true,
+        "deployer": "0x87e6fB2d31903Af287Cbcc750a9a54258e508B94",
+        "owner": "0x312e1DC164FaA89212DEb9d5b2635BB4abcA8a12",
+        "constructorArgs": [
+          "0x76371918bc75470CEE749685dC57bd6c3B8e82f2",
+          "0x312e1DC164FaA89212DEb9d5b2635BB4abcA8a12",
+          200
+        ],
+        "notes": [
+          "⚠️ Renamed from DataBatchDistributor on 2026-09-05. The old name was a leftover from the DATA era, and this contract is not tied to any particular token — which token it pays out is decided by the constructor argument token_. The rename was done before deployment, because a contract name stays on the block explorer forever.",
+          "This is what the platform's weekly payouts go through: the owner (the backend hot wallet) calls batchTransfer(batchId, addresses[], amounts[]).",
+          "⚠️ Do not confuse this with TRCMiningDistributor: that one is a Merkle claim contract — users pay their own gas and it guarantees on chain that the owner cannot touch a published allocation. This one is a platform push — the platform pays the gas, and it gives recipients **no on-chain guarantee at all** (the owner can withdraw the balance at any time).",
+          "batchId is an on-chain idempotency key: a given id can only succeed once. Off-chain timeouts and retries are routine, and without this lock a single retry would pay the same batch twice — and TRC cannot be minted.",
+          "If any single transfer fails the whole call reverts; failures are deliberately not caught and skipped, because a half-succeeded batch cannot be reconciled off chain.",
+          "Goes into the platform's .env as BATCH_DISTRIBUTOR_ADDRESS_1.",
+          "⚠️ The vault balance is the ceiling on what is lost if the hot wallet is compromised. Top it up quarterly rather than filling it once. Initial funding on 2026-09-05 was 5,000 TRC, for mainnet live-fire verification only."
+        ]
+      },
+      "PayoutRootRegistry": {
+        "source": "src/PayoutRootRegistry.sol:PayoutRootRegistry",
+        "address": "0x9B0e969d5bE6E15C75fFdDA882be7eF96157E6eC",
+        "deployedAt": "2026-09-07",
+        "verified": true,
+        "deployer": "0x87e6fB2d31903Af287Cbcc750a9a54258e508B94",
+        "owner": "0x312e1DC164FaA89212DEb9d5b2635BB4abcA8a12",
+        "constructorArgs": [
+          "0x312e1DC164FaA89212DEb9d5b2635BB4abcA8a12"
+        ],
+        "notes": [
+          "Stores the Merkle root committing to each payout period's entitlement list. It exists to make good on the published claim that TRC is distributed \"through a public, transparent on-chain mechanism\": as things stand the allocation is computed off chain and only the payment is on chain, so a third party has no way to verify who was owed what.",
+          "🔴 The root commits to what is OWED, not what was PAID. The address re-check performed before broadcasting skips entries that have become invalid, and a wallet binding can change at any time — including after the root is already on chain. So: paid = root − skipped, and the skipped list is published off chain by the platform. The strongest thing that may be said publicly is \"the commitment to this period's entitlement list is on chain, and anyone can independently verify their own share\".",
+          "⚠️ This contract holds no tokens and moves no tokens; it needs no funding. It makes the allocation verifiable, but it does not provide the guarantee that \"the owner cannot touch a published allocation\" — that property belongs to TRCMiningDistributor (Merkle claim).",
+          "⚠️ Deliberately minimal: publishRoot is the only write function. There is no update, no delete, no pause, no memo. A root that can be overwritten is not a commitment. One publication per period, immutable once written.",
+          "The owner is the same backend hot wallet as BatchDistributor's: publishRoot is onlyOwner, and publishing the root and sending the tokens come from the same identity, which is what lets a third party tie the two together.",
+          "Leaf encoding is keccak256(keccak256(abi.encode(address, uint256))), matching @openzeppelin/merkle-tree's StandardMerkleTree used off chain; both repositories pin the same set of fixed test vectors.",
+          "Goes into the platform's .env as PAYOUT_ROOT_REGISTRY_ADDRESS_1.",
+          "⚠️ On the platform side, \"no root on chain, no broadcast\" is a hard gate — if this address is not configured in the production .env, not a single token can be paid out."
+        ]
+      },
+      "TokenVesting": {
+        "source": "src/TokenVesting.sol:TokenVesting",
+        "address": "0x2C279f6f89eb1cb1D00F90DE4f1afaf89fE6aEb7",
+        "deployTx": "0x0943276139b9dcce76e28aee079f067d696c39bda0e361144a5fb97dbb63dc1b",
+        "deployedAt": "2026-09-07",
+        "deployer": "0x87e6fB2d31903Af287Cbcc750a9a54258e508B94",
+        "owner": "0x87e6fB2d31903Af287Cbcc750a9a54258e508B94",
+        "verified": true,
+        "constructorArgs": [
+          "0x76371918bc75470CEE749685dC57bd6c3B8e82f2"
+        ],
+        "teamSchedule": {
+          "scheduleId": "0xd14d435f964268efd335fcfff3e2f9e4e8ac89736885e44e81dbecb75cde102f",
+          "createTx": "0x0943276139b9dcce76e28aee079f067d696c39bda0e361144a5fb97dbb63dc1b",
+          "beneficiary": "0x82A34ea25A0d817100EF4ECC0cA06C1f8cB96863",
+          "amount": "100000000",
+          "amountNote": "Team and advisors, 10% of supply. Source: the token allocation table in the client specification.",
+          "revocable": false,
+          "semantics": "B — the first 12 months do not accrue at all",
+          "start": "2027-09-07T08:29:23Z",
+          "cliff": "2027-09-07T08:29:23Z",
+          "durationMonths": 36,
+          "slicePeriodDays": 30,
+          "fullyVestedAt": "2030-08-22",
+          "beneficiaryControlProof": {
+            "method": "personal_sign (EIP-191)",
+            "message": "TRC team vesting beneficiary confirmation 2026-09-07 / 0x82A34ea25A0d817100EF4ECC0cA06C1f8cB96863",
+            "signature": "0x6a4183cb45e8f658c4dfb95928fc7549b5f1dec563497cee636fea7cf9af34841491436b4f2030f8acde4c5b7a3ea19f05f2599a37c8c1762fef610b6cdb38f71b",
+            "recovered": "0x82A34ea25A0d817100EF4ECC0cA06C1f8cB96863",
+            "verifiedAt": "2026-09-07",
+            "why": "At the time this address had on-chain nonce 0 and zero balance, so there was no evidence whatsoever that anyone held the private key — while the beneficiary is permanently immutable once on chain and, with revocable=false, the owner cannot take the tokens back either. Naming an address nobody can open would mean 100,000,000 tokens lost forever. The signature was produced by operations staff at https://trcmining.com/vesting-signature.html."
+          }
+        },
+        "notes": [
+          "Lockup contract for the team and advisor allocation: 10% of supply, 100,000,000 TRC.",
+          "🔴 revocable=false. Only with this can the statement \"the team allocation is locked\" be true — passing true would make it a false claim that anyone could disprove on chain.",
+          "🔴 The beneficiary is written into the struct and is then permanently immutable — there is no setBeneficiary among the contract's ten functions. There is no second chance if it is wrong.",
+          "Semantics B: start is pushed 12 months out, cliffDuration=0, duration=36 months. The contract accrues linearly from start, so under scheme A (start=today, cliff=12 months) 12/36 ≈ 33,330,000 tokens would be claimable on the cliff date itself; under B, zero. The difference is pinned by an on-chain measurement in test/TokenVesting.test.ts. The cost of B: full vesting lands in month 48 rather than month 36.",
+          "release() sends to schedule.beneficiary, hard-coded — the owner can trigger a release, but the tokens can only go to the beneficiary; the recipient cannot be changed.",
+          "⚠️ A ledger defect in revoke() was fixed in the same batch on 2026-09-07: the inline release did not decrement vestingSchedulesTotalAmount, which made getWithdrawableAmount() under-report and left that amount permanently stuck. revocable=false never reaches that path, but the deployed bytecode is the fixed version.",
+          "✅ Source-verified on Etherscan on 2026-09-07 (solc v0.8.20+commit.a1b79de6, optimizer 200 runs). The whitepaper directs readers to check this contract — the one holding 100,000,000 tokens — on chain, which would mean little without published source.",
+          "Funded from the initial recipient address 0x1375b29a88474199E1AA5b46C639D0c3cDf5EAfB (100,000,000 tokens transferred in)."
+        ],
+        "verifiedAt": "2026-09-07"
+      }
+    }
+  }
+}
